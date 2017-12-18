@@ -1,6 +1,10 @@
 package goph
 
 import (
+	"bytes"
+	"io"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/cgi"
 	"path/filepath"
@@ -35,6 +39,7 @@ func (s *Serv) handleFunc(w http.ResponseWriter, r *http.Request) {
 	f := filepath.Join(s.WwwRoot, r.URL.Path)
 	ext := strings.ToLower(filepath.Ext(f))
 	if ext == ".php" {
+		//php file
 		handler := new(cgi.Handler)
 		handler.Path = s.PhpBin
 		handler.Env = append(handler.Env, "REQUEST_METHOD="+r.Method)
@@ -42,6 +47,17 @@ func (s *Serv) handleFunc(w http.ResponseWriter, r *http.Request) {
 		handler.Env = append(handler.Env, "SCRIPT_FILENAME="+f)
 		handler.ServeHTTP(w, r)
 	} else {
-		//TODO: serve static file
+		//static file
+		data, err := ioutil.ReadFile(f)
+		if err != nil {
+			log.Printf("file %s not found", f)
+			return
+		}
+		buff := bytes.NewReader(data)
+		_, err = io.Copy(w, buff)
+		if err != nil {
+			log.Printf("io.Copy(w, buff) fail (file:%s)", f)
+			return
+		}
 	}
 }

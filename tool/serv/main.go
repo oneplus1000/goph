@@ -8,7 +8,7 @@ import (
 
 func main() {
 	pserv := goph.Serv{
-		WwwRoot: "/Users/oneplus/go/src/github.com/oneplus1000/goph/testing/hello",
+		WwwRoot: "/Users/oneplus/go/src/github.com/oneplus1000/goph/testing",
 		PhpBin:  "/usr/local/bin/php-cgi",
 	}
 	err := pserv.Start()
